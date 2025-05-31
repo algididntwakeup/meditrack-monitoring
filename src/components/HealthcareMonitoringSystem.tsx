@@ -31,7 +31,7 @@ const HealthcareMonitoringSystem = () => {
   ];
 
   const LoginForm = () => {
-    const [credentials, setCredentials] = useState({ username: '', password: '' });
+    const [credentials, setCredentials] = useState({ username: 'atmin', password: 'atmin123' });
 
     const handleLogin = (e: React.FormEvent<HTMLFormElement>) => {
       e.preventDefault();
