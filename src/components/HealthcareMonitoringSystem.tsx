@@ -33,7 +33,7 @@ const HealthcareMonitoringSystem = () => {
   const LoginForm = () => {
     const [credentials, setCredentials] = useState({ username: '', password: '' });
 
-    const handleLogin = (e) => {
+    const handleLogin = (e: React.FormEvent<HTMLFormElement>) => {
       e.preventDefault();
       setUser({
         name: 'Dr. Sarah Wijaya',
@@ -62,7 +62,7 @@ const HealthcareMonitoringSystem = () => {
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 placeholder="Masukkan username"
                 value={credentials.username}
-                onChange={(e) => setCredentials({...credentials, username: e.target.value})}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setCredentials({...credentials, username: e.target.value})}
               />
             </div>
             <div>
@@ -72,7 +72,7 @@ const HealthcareMonitoringSystem = () => {
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 placeholder="Masukkan password"
                 value={credentials.password}
-                onChange={(e) => setCredentials({...credentials, password: e.target.value})}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setCredentials({...credentials, password: e.target.value})}
               />
             </div>
             <button
@@ -162,27 +162,36 @@ const HealthcareMonitoringSystem = () => {
     </div>
   );
 
-  const StatCard = ({ title, value, unit, change, icon: Icon, color }) => (
-    <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
-      <div className="flex items-center justify-between">
-        <div>
-          <p className="text-sm font-medium text-gray-600">{title}</p>
-          <div className="flex items-baseline space-x-2">
-            <p className="text-2xl font-bold text-gray-800">{value}</p>
-            {unit && <span className="text-sm text-gray-600">{unit}</span>}
-          </div>
-          {change && (
-            <p className={`text-sm ${change > 0 ? 'text-green-600' : 'text-red-600'}`}>
-              {change > 0 ? '+' : ''}{change}% dari kemarin
-            </p>
-          )}
+  type StatCardProps = {
+  title: string;
+  value: string | number;
+  unit?: string;
+  change?: number;
+  icon: React.ElementType;
+  color: string;
+};
+
+const StatCard = ({ title, value, unit, change, icon: Icon, color }: StatCardProps) => (
+  <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
+    <div className="flex items-center justify-between">
+      <div>
+        <p className="text-sm font-medium text-gray-600">{title}</p>
+        <div className="flex items-baseline space-x-2">
+          <p className="text-2xl font-bold text-gray-800">{value}</p>
+          {unit && <span className="text-sm text-gray-600">{unit}</span>}
         </div>
-        <div className={`p-3 rounded-lg ${color}`}>
-          <Icon className="w-6 h-6 text-white" />
-        </div>
+        {change && (
+          <p className={`text-sm ${change > 0 ? 'text-green-600' : 'text-red-600'}`}>
+            {change > 0 ? '+' : ''}{change}% dari kemarin
+          </p>
+        )}
+      </div>
+      <div className={`p-3 rounded-lg ${color}`}>
+        <Icon className="w-6 h-6 text-white" />
       </div>
     </div>
-  );
+  </div>
+);
 
   const Dashboard = () => (
     <div className="space-y-6">
@@ -226,7 +235,7 @@ const HealthcareMonitoringSystem = () => {
             <select 
               className="px-3 py-1 border border-gray-300 rounded-lg text-sm"
               value={selectedPeriod}
-              onChange={(e) => setSelectedPeriod(e.target.value)}
+              onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setSelectedPeriod(e.target.value)}
             >
               <option value="daily">Harian</option>
               <option value="weekly">Mingguan</option>
