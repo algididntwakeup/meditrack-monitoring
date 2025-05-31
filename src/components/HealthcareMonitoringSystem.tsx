@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, PieChart, Pie, Cell } from 'recharts';
-import { User, Users, Clock, Activity, FileText, Calendar, TrendingUp, Bell, Settings, LogOut, Eye, Download } from 'lucide-react';
+import { User, Users, Clock, Activity, FileText, TrendingUp, Bell, Settings, LogOut, Eye, Download } from 'lucide-react';
 
 const HealthcareMonitoringSystem = () => {
   const [activeTab, setActiveTab] = useState('dashboard');
@@ -31,7 +31,7 @@ const HealthcareMonitoringSystem = () => {
   ];
 
   const LoginForm = () => {
-    const [credentials, setCredentials] = useState({ username: 'atmin', password: 'atmint' });
+    const [credentials, setCredentials] = useState({ username: '', password: '' });
 
     const handleLogin = (e) => {
       e.preventDefault();
@@ -95,7 +95,7 @@ const HealthcareMonitoringSystem = () => {
             <Activity className="w-6 h-6 text-blue-600" />
           </div>
           <div>
-            <h2 className="font-bold text-gray-800">MediTrack</h2>
+            <h2 className="font-bold text-gray-800">Puskesmas</h2>
             <p className="text-sm text-gray-600">Monitoring System</p>
           </div>
         </div>
