@@ -95,7 +95,7 @@ const HealthcareMonitoringSystem = () => {
             <Activity className="w-6 h-6 text-blue-600" />
           </div>
           <div>
-            <h2 className="font-bold text-gray-800">Puskesmas</h2>
+            <h2 className="font-bold text-gray-800">MediTrack</h2>
             <p className="text-sm text-gray-600">Monitoring System</p>
           </div>
         </div>
