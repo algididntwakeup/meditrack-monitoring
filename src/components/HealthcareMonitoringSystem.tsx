@@ -444,8 +444,8 @@ const StatCard = ({ title, value, unit, change, icon: Icon, color }: StatCardPro
             <tbody>
               {[1,2,3,4,5].map(i => (
                 <tr key={i} className="border-b border-gray-100">
-                  <td className="py-3">2024-05-{30-i}</td>
-                  <td className="py-3">Laporan Harian</td>
+                  <td className="py-3 text-gray-600">2024-05-{30-i}</td>
+                  <td className="py-3 text-gray-600">Laporan Harian</td>
                   <td className="py-3">
                     <span className="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs">Selesai</span>
                   </td>
@@ -594,7 +594,7 @@ const StatCard = ({ title, value, unit, change, icon: Icon, color }: StatCardPro
               <input
                 type="text"
                 defaultValue="Dr. Sarah Wijaya"
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                className="text-gray-600 w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
               />
             </div>
             <div>
@@ -602,7 +602,7 @@ const StatCard = ({ title, value, unit, change, icon: Icon, color }: StatCardPro
               <input
                 type="text"
                 defaultValue="Dokter Umum"
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                className="text-gray-600 w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
               />
             </div>
           </div>
@@ -611,7 +611,7 @@ const StatCard = ({ title, value, unit, change, icon: Icon, color }: StatCardPro
             <input
               type="email"
               defaultValue="sarah.wijaya@puskesmas.id"
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+              className="text-gray-600 w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
             />
           </div>
           <button className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
