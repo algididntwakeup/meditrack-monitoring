@@ -1,13 +1,16 @@
-import React, { useState } from 'react';
+// src/components/HealthcareMonitoringSystem.tsx
+import React, { useState, useEffect } from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, PieChart, Pie, Cell } from 'recharts';
-import { User, Users, Clock, Activity, FileText, TrendingUp, Bell, Settings, LogOut, Eye, Download } from 'lucide-react';
+import { User, Users, Clock, Activity, FileText, TrendingUp, Bell, Settings, LogOut, Eye, Download, Smile, Frown, Menu, X } from 'lucide-react'; // Import Menu and X icons
 
 const HealthcareMonitoringSystem = () => {
   const [activeTab, setActiveTab] = useState('dashboard');
   const [user, setUser] = useState(null);
   const [selectedPeriod, setSelectedPeriod] = useState('daily');
+  const [sentimentData, setSentimentData] = useState([]);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false); // New state for sidebar visibility
 
-  // Mock data
+  // Mock data (keep your existing mock data)
   const performanceData = [
     { date: '2024-05-27', patients: 25, consultations: 20, waitTime: 15, satisfaction: 4.2 },
     { date: '2024-05-28', patients: 32, consultations: 28, waitTime: 12, satisfaction: 4.5 },
@@ -29,6 +32,20 @@ const HealthcareMonitoringSystem = () => {
     { name: 'Kebidanan', value: 20, color: '#F59E0B' },
     { name: 'Gigi', value: 20, color: '#EF4444' }
   ];
+
+  // New mock data for sentiment analysis
+  const mockSentimentData = [
+    { month: 'Jan', positive: 70, neutral: 20, negative: 10 },
+    { month: 'Feb', positive: 75, neutral: 15, negative: 10 },
+    { month: 'Mar', positive: 80, neutral: 10, negative: 10 },
+    { month: 'Apr', positive: 85, neutral: 10, negative: 5 },
+    { month: 'May', positive: 82, neutral: 13, negative: 5 },
+  ];
+
+  useEffect(() => {
+    // In a real application, you would fetch this data from an API
+    setSentimentData(mockSentimentData);
+  }, []);
 
   const LoginForm = () => {
     const [credentials, setCredentials] = useState({ username: 'atmin', password: 'atmin123' });
@@ -88,8 +105,10 @@ const HealthcareMonitoringSystem = () => {
   };
 
   const Sidebar = () => (
-    <div className="w-64 bg-white shadow-lg h-screen">
-      <div className="p-6 border-b border-gray-200">
+    <div className={`fixed inset-y-0 left-0 w-64 bg-white shadow-lg h-screen z-50 transform transition-transform duration-300 ease-in-out
+      md:relative md:translate-x-0 ${isSidebarOpen ? 'sidebar-mobile-visible' : 'sidebar-mobile-hidden'}`} // Apply responsive classes
+    >
+      <div className="p-6 border-b border-gray-200 flex items-center justify-between">
         <div className="flex items-center space-x-3">
           <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
             <Activity className="w-6 h-6 text-blue-600" />
@@ -99,6 +118,9 @@ const HealthcareMonitoringSystem = () => {
             <p className="text-sm text-gray-600">Monitoring System</p>
           </div>
         </div>
+        <button className="md:hidden p-2" onClick={() => setIsSidebarOpen(false)}> {/* Close button for mobile */}
+          <X className="w-6 h-6 text-gray-600" />
+        </button>
       </div>
       
       <nav className="mt-6">
@@ -107,11 +129,15 @@ const HealthcareMonitoringSystem = () => {
           { id: 'performance', icon: Activity, label: 'Kinerja Individu' },
           { id: 'reports', icon: FileText, label: 'Laporan' },
           { id: 'team', icon: Users, label: 'Tim Medis' },
+          { id: 'sentiment', icon: Smile, label: 'Analitik Sentimen AI' },
           { id: 'settings', icon: Settings, label: 'Pengaturan' }
         ].map(item => (
           <button
             key={item.id}
-            onClick={() => setActiveTab(item.id)}
+            onClick={() => {
+              setActiveTab(item.id);
+              setIsSidebarOpen(false); // Close sidebar on item click for mobile
+            }}
             className={`w-full flex items-center space-x-3 px-6 py-3 text-left hover:bg-blue-50 transition-colors ${
               activeTab === item.id ? 'bg-blue-50 text-blue-600 border-r-2 border-blue-600' : 'text-gray-600'
             }`}
@@ -125,38 +151,40 @@ const HealthcareMonitoringSystem = () => {
   );
 
   const Header = () => (
-    <div className="bg-white shadow-sm border-b border-gray-200 px-6 py-4">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-800">
+    <div className="bg-white shadow-sm border-b border-gray-200 px-6 py-4 flex items-center justify-between md:justify-end"> {/* Adjust justify-end for mobile */}
+      <button className="md:hidden p-2 mr-4" onClick={() => setIsSidebarOpen(true)}> {/* Hamburger menu button for mobile */}
+        <Menu className="w-6 h-6 text-gray-600" />
+      </button>
+      <div>
+          <h1 className="text-2xl font-bold text-gray-800 hidden md:block"> {/* Hide on mobile */}
             {activeTab === 'dashboard' && 'Dashboard'}
             {activeTab === 'performance' && 'Kinerja Individu'}
             {activeTab === 'reports' && 'Laporan'}
             {activeTab === 'team' && 'Tim Medis'}
+            {activeTab === 'sentiment' && 'Analitik Sentimen AI'}
             {activeTab === 'settings' && 'Pengaturan'}
           </h1>
-          <p className="text-gray-600">Sistem Monitoring Kinerja Tenaga Kesehatan</p>
+          <p className="text-gray-600 hidden md:block">Sistem Monitoring Kinerja Tenaga Kesehatan</p> {/* Hide on mobile */}
         </div>
-        
-        <div className="flex items-center space-x-4">
-          <button className="p-2 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-lg">
-            <Bell className="w-5 h-5" />
-          </button>
-          <div className="flex items-center space-x-3">
-            <div className="text-right">
-              <p className="font-medium text-gray-800">{user?.name}</p>
-              <p className="text-sm text-gray-600">{user?.role}</p>
-            </div>
-            <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
-              <User className="w-6 h-6 text-blue-600" />
-            </div>
-            <button 
-              onClick={() => setUser(null)}
-              className="p-2 text-gray-600 hover:text-red-600 hover:bg-red-50 rounded-lg"
-            >
-              <LogOut className="w-5 h-5" />
-            </button>
+      
+      <div className="flex items-center space-x-4">
+        <button className="p-2 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-lg">
+          <Bell className="w-5 h-5" />
+        </button>
+        <div className="flex items-center space-x-3">
+          <div className="text-right">
+            <p className="font-medium text-gray-800">{user?.name}</p>
+            <p className="text-sm text-gray-600">{user?.role}</p>
           </div>
+          <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
+            <User className="w-6 h-6 text-blue-600" />
+          </div>
+          <button 
+            onClick={() => setUser(null)}
+            className="p-2 text-gray-600 hover:text-red-600 hover:bg-red-50 rounded-lg"
+          >
+            <LogOut className="w-5 h-5" />
+          </button>
         </div>
       </div>
     </div>
@@ -495,6 +523,66 @@ const StatCard = ({ title, value, unit, change, icon: Icon, color }: StatCardPro
     </div>
   );
 
+  const SentimentAnalysisTab = () => (
+    <div className="space-y-6">
+      <div className="bg-white rounded-xl shadow-sm p-6">
+        <h3 className="text-lg font-semibold text-gray-800 mb-4">Analisis Sentimen Kepuasan Pasien (AI)</h3>
+        <p className="text-gray-600 mb-4">Memanfaatkan AI untuk menganalisis umpan balik tekstual pasien dan mengukur sentimen mereka terhadap layanan Puskesmas secara keseluruhan.</p>
+        
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+          <StatCard
+            title="Sentimen Positif"
+            value="82%"
+            icon={Smile}
+            color="bg-green-500"
+          />
+          <StatCard
+            title="Sentimen Netral"
+            value="13%"
+            icon={FileText}
+            color="bg-blue-500"
+          />
+          <StatCard
+            title="Sentimen Negatif"
+            value="5%"
+            icon={Frown}
+            color="bg-red-500"
+          />
+        </div>
+
+        <h4 className="text-md font-semibold text-gray-800 mt-6 mb-3">Trend Sentimen Bulanan</h4>
+        <ResponsiveContainer width="100%" height={300}>
+          <LineChart data={sentimentData}>
+            <CartesianGrid strokeDasharray="3 3" />
+            <XAxis dataKey="month" />
+            <YAxis />
+            <Tooltip />
+            <Line type="monotone" dataKey="positive" stroke="#10B981" strokeWidth={2} name="Positif" />
+            <Line type="monotone" dataKey="neutral" stroke="#3B82F6" strokeWidth={2} name="Netral" />
+            <Line type="monotone" dataKey="negative" stroke="#EF4444" strokeWidth={2} name="Negatif" />
+          </LineChart>
+        </ResponsiveContainer>
+
+        <h4 className="text-md font-semibold text-gray-800 mt-6 mb-3">Umpan Balik Terbaru (Contoh)</h4>
+        <div className="space-y-3">
+          <div className="p-3 bg-gray-50 rounded-lg border border-gray-200">
+            <p className="text-gray-700">"Pelayanan sangat cepat dan ramah, dokter menjelaskan dengan jelas. Sangat puas!"</p>
+            <p className="text-xs text-gray-500 mt-1 flex items-center"><Smile className="w-3 h-3 mr-1 text-green-600" /> Sentimen: Positif</p>
+          </div>
+          <div className="p-3 bg-gray-50 rounded-lg border border-gray-200">
+            <p className="text-gray-700">"Waktu tunggu sedikit lama, tapi stafnya membantu."</p>
+            <p className="text-xs text-gray-500 mt-1 flex items-center"><FileText className="w-3 h-3 mr-1 text-blue-600" /> Sentimen: Netral</p>
+          </div>
+          <div className="p-3 bg-gray-50 rounded-lg border border-gray-200">
+            <p className="text-gray-700">"Agak kecewa dengan kurangnya informasi yang diberikan."</p>
+            <p className="text-xs text-gray-500 mt-1 flex items-center"><Frown className="w-3 h-3 mr-1 text-red-600" /> Sentimen: Negatif</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+
+
   const SettingsTab = () => (
     <div className="space-y-6">
       <div className="bg-white rounded-xl shadow-sm p-6">
@@ -582,6 +670,7 @@ const StatCard = ({ title, value, unit, change, icon: Icon, color }: StatCardPro
   return (
     <div className="flex h-screen bg-gray-50">
       <Sidebar />
+      {isSidebarOpen && <div className="overlay md:hidden" onClick={() => setIsSidebarOpen(false)}></div>} {/* Overlay for mobile */}
       <div className="flex-1 flex flex-col overflow-hidden">
         <Header />
         <main className="flex-1 overflow-y-auto p-6">
@@ -589,6 +678,7 @@ const StatCard = ({ title, value, unit, change, icon: Icon, color }: StatCardPro
           {activeTab === 'performance' && <PerformanceTab />}
           {activeTab === 'reports' && <ReportsTab />}
           {activeTab === 'team' && <TeamTab />}
+          {activeTab === 'sentiment' && <SentimentAnalysisTab />}
           {activeTab === 'settings' && <SettingsTab />}
         </main>
       </div>
