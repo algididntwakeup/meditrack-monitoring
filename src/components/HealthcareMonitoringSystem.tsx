@@ -1,14 +1,17 @@
 // src/components/HealthcareMonitoringSystem.tsx
 import React, { useState, useEffect } from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, PieChart, Pie, Cell } from 'recharts';
-import { User, Users, Clock, Activity, FileText, TrendingUp, Bell, Settings, LogOut, Eye, Download, Smile, Frown, Menu, X } from 'lucide-react'; // Import Menu and X icons
+import { User, Users, Clock, Activity, FileText, TrendingUp, Bell, Settings, LogOut, Eye, Download, Smile, Frown, Menu, X } from 'lucide-react';
 
 const HealthcareMonitoringSystem = () => {
   const [activeTab, setActiveTab] = useState('dashboard');
   const [user, setUser] = useState(null);
   const [selectedPeriod, setSelectedPeriod] = useState('daily');
   const [sentimentData, setSentimentData] = useState([]);
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false); // New state for sidebar visibility
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  
+  // 1. State baru untuk mengelola modal laporan
+  const [reportModalContent, setReportModalContent] = useState<string | null>(null); // 'Harian', 'Mingguan', 'Bulanan', or null
 
   // Mock data (keep your existing mock data)
   const performanceData = [
@@ -21,7 +24,9 @@ const HealthcareMonitoringSystem = () => {
 
   const teamData = [
     { name: 'Dr. Sarah', patients: 156, consultations: 140, rating: 4.7, department: 'Umum' },
+    { name: 'Dr. Asep', patients: 108, consultations: 98, rating: 4.3, department: 'Umum' },
     { name: 'Dr. Ahmad', patients: 142, consultations: 128, rating: 4.5, department: 'Anak' },
+    { name: 'Dr. Dofi', patients: 113, consultations: 110, rating: 4.2, department: 'Anak' },
     { name: 'Ns. Rina', patients: 98, consultations: 85, rating: 4.3, department: 'Kebidanan' },
     { name: 'Dr. Maya', patients: 134, consultations: 120, rating: 4.6, department: 'Gigi' }
   ];
@@ -32,8 +37,7 @@ const HealthcareMonitoringSystem = () => {
     { name: 'Kebidanan', value: 20, color: '#F59E0B' },
     { name: 'Gigi', value: 20, color: '#EF4444' }
   ];
-
-  // New mock data for sentiment analysis
+  
   const mockSentimentData = [
     { month: 'Jan', positive: 70, neutral: 20, negative: 10 },
     { month: 'Feb', positive: 75, neutral: 15, negative: 10 },
@@ -43,7 +47,6 @@ const HealthcareMonitoringSystem = () => {
   ];
 
   useEffect(() => {
-    // In a real application, you would fetch this data from an API
     setSentimentData(mockSentimentData);
   }, []);
 
@@ -106,7 +109,7 @@ const HealthcareMonitoringSystem = () => {
 
   const Sidebar = () => (
     <div className={`fixed inset-y-0 left-0 w-64 bg-white shadow-lg h-screen z-50 transform transition-transform duration-300 ease-in-out
-      md:relative md:translate-x-0 ${isSidebarOpen ? 'sidebar-mobile-visible' : 'sidebar-mobile-hidden'}`} // Apply responsive classes
+      md:relative md:translate-x-0 ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}
     >
       <div className="p-6 border-b border-gray-200 flex items-center justify-between">
         <div className="flex items-center space-x-3">
@@ -118,7 +121,7 @@ const HealthcareMonitoringSystem = () => {
             <p className="text-sm text-gray-600">Monitoring System</p>
           </div>
         </div>
-        <button className="md:hidden p-2" onClick={() => setIsSidebarOpen(false)}> {/* Close button for mobile */}
+        <button className="md:hidden p-2" onClick={() => setIsSidebarOpen(false)}>
           <X className="w-6 h-6 text-gray-600" />
         </button>
       </div>
@@ -136,7 +139,7 @@ const HealthcareMonitoringSystem = () => {
             key={item.id}
             onClick={() => {
               setActiveTab(item.id);
-              setIsSidebarOpen(false); // Close sidebar on item click for mobile
+              setIsSidebarOpen(false);
             }}
             className={`w-full flex items-center space-x-3 px-6 py-3 text-left hover:bg-blue-50 transition-colors ${
               activeTab === item.id ? 'bg-blue-50 text-blue-600 border-r-2 border-blue-600' : 'text-gray-600'
@@ -151,20 +154,16 @@ const HealthcareMonitoringSystem = () => {
   );
 
   const Header = () => (
-    <div className="bg-white shadow-sm border-b border-gray-200 px-6 py-4 flex items-center justify-between md:justify-end"> {/* Adjust justify-end for mobile */}
-      <button className="md:hidden p-2 mr-4" onClick={() => setIsSidebarOpen(true)}> {/* Hamburger menu button for mobile */}
-        <Menu className="w-6 h-6 text-gray-600" />
-      </button>
-      <div>
-          <h1 className="text-2xl font-bold text-gray-800 hidden md:block"> {/* Hide on mobile */}
-            {activeTab === 'dashboard' && 'Dashboard'}
-            {activeTab === 'performance' && 'Kinerja Individu'}
-            {activeTab === 'reports' && 'Laporan'}
-            {activeTab === 'team' && 'Tim Medis'}
-            {activeTab === 'sentiment' && 'Analitik Sentimen AI'}
-            {activeTab === 'settings' && 'Pengaturan'}
-          </h1>
-          <p className="text-gray-600 hidden md:block">Sistem Monitoring Kinerja Tenaga Kesehatan</p> {/* Hide on mobile */}
+    <div className="bg-white shadow-sm border-b border-gray-200 px-6 py-4 flex items-center justify-between">
+      <div className="flex items-center">
+        <button className="md:hidden p-2 mr-4" onClick={() => setIsSidebarOpen(true)}>
+          <Menu className="w-6 h-6 text-gray-600" />
+        </button>
+        <div>
+            <h1 className="text-xl md:text-2xl font-bold text-gray-800">
+              {activeTab.charAt(0).toUpperCase() + activeTab.slice(1)}
+            </h1>
+          </div>
         </div>
       
       <div className="flex items-center space-x-4">
@@ -172,7 +171,7 @@ const HealthcareMonitoringSystem = () => {
           <Bell className="w-5 h-5" />
         </button>
         <div className="flex items-center space-x-3">
-          <div className="text-right">
+          <div className="text-right hidden sm:block">
             <p className="font-medium text-gray-800">{user?.name}</p>
             <p className="text-sm text-gray-600">{user?.role}</p>
           </div>
@@ -191,39 +190,39 @@ const HealthcareMonitoringSystem = () => {
   );
 
   type StatCardProps = {
-  title: string;
-  value: string | number;
-  unit?: string;
-  change?: number;
-  icon: React.ElementType;
-  color: string;
-};
+    title: string;
+    value: string | number;
+    unit?: string;
+    change?: number;
+    icon: React.ElementType;
+    color: string;
+  };
 
-const StatCard = ({ title, value, unit, change, icon: Icon, color }: StatCardProps) => (
-  <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
-    <div className="flex items-center justify-between">
-      <div>
-        <p className="text-sm font-medium text-gray-600">{title}</p>
-        <div className="flex items-baseline space-x-2">
-          <p className="text-2xl font-bold text-gray-800">{value}</p>
-          {unit && <span className="text-sm text-gray-600">{unit}</span>}
+  const StatCard = ({ title, value, unit, change, icon: Icon, color }: StatCardProps) => (
+    <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
+      <div className="flex items-center justify-between">
+        <div>
+          <p className="text-sm font-medium text-gray-600">{title}</p>
+          <div className="flex items-baseline space-x-2">
+            <p className="text-2xl font-bold text-gray-800">{value}</p>
+            {unit && <span className="text-sm text-gray-600">{unit}</span>}
+          </div>
+          {change !== undefined && (
+            <p className={`text-sm ${change > 0 ? 'text-green-600' : 'text-red-600'}`}>
+              {change > 0 ? '+' : ''}{change}% dari kemarin
+            </p>
+          )}
         </div>
-        {change && (
-          <p className={`text-sm ${change > 0 ? 'text-green-600' : 'text-red-600'}`}>
-            {change > 0 ? '+' : ''}{change}% dari kemarin
-          </p>
-        )}
-      </div>
-      <div className={`p-3 rounded-lg ${color}`}>
-        <Icon className="w-6 h-6 text-white" />
+        <div className={`p-3 rounded-lg ${color}`}>
+          <Icon className="w-6 h-6 text-white" />
+        </div>
       </div>
     </div>
-  </div>
-);
+  );
 
   const Dashboard = () => (
     <div className="space-y-6">
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <StatCard
           title="Total Pasien Hari Ini"
           value="40"
@@ -294,6 +293,8 @@ const StatCard = ({ title, value, unit, change, icon: Icon, color }: StatCardPro
                 outerRadius={120}
                 paddingAngle={5}
                 dataKey="value"
+                labelLine={false}
+                label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
               >
                 {departmentStats.map((entry, index) => (
                   <Cell key={`cell-${index}`} fill={entry.color} />
@@ -302,14 +303,6 @@ const StatCard = ({ title, value, unit, change, icon: Icon, color }: StatCardPro
               <Tooltip />
             </PieChart>
           </ResponsiveContainer>
-          <div className="flex flex-wrap justify-center mt-4 space-x-4">
-            {departmentStats.map((item, index) => (
-              <div key={index} className="flex items-center space-x-2">
-                <div className={`w-3 h-3 rounded-full`} style={{backgroundColor: item.color}}></div>
-                <span className="text-sm text-gray-600">{item.name} ({item.value}%)</span>
-              </div>
-            ))}
-          </div>
         </div>
       </div>
     </div>
@@ -317,7 +310,7 @@ const StatCard = ({ title, value, unit, change, icon: Icon, color }: StatCardPro
 
   const PerformanceTab = () => (
     <div className="space-y-6">
-      <div className="bg-white rounded-xl shadow-sm p-6">
+        <div className="bg-white rounded-xl shadow-sm p-6">
         <h3 className="text-lg font-semibold text-gray-800 mb-4">Kinerja Harian Saya</h3>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="text-center p-4 bg-blue-50 rounded-lg">
@@ -347,39 +340,6 @@ const StatCard = ({ title, value, unit, change, icon: Icon, color }: StatCardPro
           </BarChart>
         </ResponsiveContainer>
       </div>
-
-      <div className="bg-white rounded-xl shadow-sm p-6">
-        <h3 className="text-lg font-semibold text-gray-800 mb-4">Target vs Pencapaian</h3>
-        <div className="space-y-4">
-          <div>
-            <div className="flex justify-between mb-2">
-              <span className="text-sm text-gray-600">Pasien per Hari</span>
-              <span className="text-sm font-medium">40/35 (114%)</span>
-            </div>
-            <div className="w-full bg-gray-200 rounded-full h-2">
-              <div className="bg-green-500 h-2 rounded-full" style={{width: '100%'}}></div>
-            </div>
-          </div>
-          <div>
-            <div className="flex justify-between mb-2">
-              <span className="text-sm text-gray-600">Waktu Tunggu Max</span>
-              <span className="text-sm font-medium">8/15 menit (53%)</span>
-            </div>
-            <div className="w-full bg-gray-200 rounded-full h-2">
-              <div className="bg-green-500 h-2 rounded-full" style={{width: '53%'}}></div>
-            </div>
-          </div>
-          <div>
-            <div className="flex justify-between mb-2">
-              <span className="text-sm text-gray-600">Rating Kepuasan</span>
-              <span className="text-sm font-medium">4.8/4.5 (107%)</span>
-            </div>
-            <div className="w-full bg-gray-200 rounded-full h-2">
-              <div className="bg-green-500 h-2 rounded-full" style={{width: '100%'}}></div>
-            </div>
-          </div>
-        </div>
-      </div>
     </div>
   );
 
@@ -388,24 +348,17 @@ const StatCard = ({ title, value, unit, change, icon: Icon, color }: StatCardPro
       <div className="bg-white rounded-xl shadow-sm p-6">
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-lg font-semibold text-gray-800">Generate Laporan</h3>
-          <div className="flex space-x-2">
-            <select className="px-3 py-2 border border-gray-300 rounded-lg">
-              <option>Laporan Harian</option>
-              <option>Laporan Mingguan</option>
-              <option>Laporan Bulanan</option>
-            </select>
-            <button className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center space-x-2">
-              <Download className="w-4 h-4" />
-              <span>Download</span>
-            </button>
-          </div>
         </div>
         
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          {/* 3. Modifikasi pada tombol "Lihat", tambahkan onClick untuk membuka modal */}
           <div className="p-4 border border-gray-200 rounded-lg">
             <h4 className="font-medium text-gray-800 mb-2">Laporan Harian</h4>
             <p className="text-sm text-gray-600 mb-3">Ringkasan kinerja hari ini</p>
-            <button className="w-full px-3 py-2 bg-gray-100 text-gray-700 rounded hover:bg-gray-200 flex items-center justify-center space-x-2">
+            <button 
+              onClick={() => setReportModalContent('Harian')}
+              className="w-full px-3 py-2 bg-gray-100 text-gray-700 rounded hover:bg-gray-200 flex items-center justify-center space-x-2"
+            >
               <Eye className="w-4 h-4" />
               <span>Lihat</span>
             </button>
@@ -413,7 +366,10 @@ const StatCard = ({ title, value, unit, change, icon: Icon, color }: StatCardPro
           <div className="p-4 border border-gray-200 rounded-lg">
             <h4 className="font-medium text-gray-800 mb-2">Laporan Mingguan</h4>
             <p className="text-sm text-gray-600 mb-3">Analisis trend mingguan</p>
-            <button className="w-full px-3 py-2 bg-gray-100 text-gray-700 rounded hover:bg-gray-200 flex items-center justify-center space-x-2">
+            <button 
+              onClick={() => setReportModalContent('Mingguan')}
+              className="w-full px-3 py-2 bg-gray-100 text-gray-700 rounded hover:bg-gray-200 flex items-center justify-center space-x-2"
+            >
               <Eye className="w-4 h-4" />
               <span>Lihat</span>
             </button>
@@ -421,7 +377,10 @@ const StatCard = ({ title, value, unit, change, icon: Icon, color }: StatCardPro
           <div className="p-4 border border-gray-200 rounded-lg">
             <h4 className="font-medium text-gray-800 mb-2">Laporan Bulanan</h4>
             <p className="text-sm text-gray-600 mb-3">Evaluasi kinerja bulanan</p>
-            <button className="w-full px-3 py-2 bg-gray-100 text-gray-700 rounded hover:bg-gray-200 flex items-center justify-center space-x-2">
+            <button 
+              onClick={() => setReportModalContent('Bulanan')}
+              className="w-full px-3 py-2 bg-gray-100 text-gray-700 rounded hover:bg-gray-200 flex items-center justify-center space-x-2"
+            >
               <Eye className="w-4 h-4" />
               <span>Lihat</span>
             </button>
@@ -435,22 +394,21 @@ const StatCard = ({ title, value, unit, change, icon: Icon, color }: StatCardPro
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-gray-200">
-                <th className="text-left py-3 font-medium text-gray-600">Tanggal</th>
-                <th className="text-left py-3 font-medium text-gray-600">Jenis Laporan</th>
-                <th className="text-left py-3 font-medium text-gray-600">Status</th>
-                <th className="text-left py-3 font-medium text-gray-600">Aksi</th>
+                <th className="text-left py-3 px-2 font-medium text-gray-600">Tanggal</th>
+                <th className="text-left py-3 px-2 font-medium text-gray-600">Jenis Laporan</th>
+                <th className="text-left py-3 px-2 font-medium text-gray-600">Aksi</th>
               </tr>
             </thead>
             <tbody>
               {[1,2,3,4,5].map(i => (
                 <tr key={i} className="border-b border-gray-100">
-                  <td className="py-3 text-gray-600">2024-05-{30-i}</td>
-                  <td className="py-3 text-gray-600">Laporan Harian</td>
-                  <td className="py-3">
-                    <span className="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs">Selesai</span>
-                  </td>
-                  <td className="py-3">
-                    <button className="text-blue-600 hover:text-blue-800 text-sm">Download</button>
+                  <td className="py-3 px-2 text-gray-600">2024-05-{30-i}</td>
+                  <td className="py-3 px-2 text-gray-600">Laporan Kinerja Harian</td>
+                  <td className="py-3 px-2">
+                    <button className="text-blue-600 hover:text-blue-800 text-sm flex items-center space-x-1">
+                      <Download className="w-4 h-4" />
+                      <span>Download</span>
+                    </button>
                   </td>
                 </tr>
               ))}
@@ -463,24 +421,22 @@ const StatCard = ({ title, value, unit, change, icon: Icon, color }: StatCardPro
 
   const TeamTab = () => (
     <div className="space-y-6">
-      <div className="bg-white rounded-xl shadow-sm p-6">
+       <div className="bg-white rounded-xl shadow-sm p-6">
         <h3 className="text-lg font-semibold text-gray-800 mb-4">Kinerja Tim Medis</h3>
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead>
               <tr className="border-b border-gray-200">
-                <th className="text-left py-3 font-medium text-gray-600">Nama</th>
-                <th className="text-left py-3 font-medium text-gray-600">Departemen</th>
-                <th className="text-left py-3 font-medium text-gray-600">Pasien</th>
-                <th className="text-left py-3 font-medium text-gray-600">Konsultasi</th>
-                <th className="text-left py-3 font-medium text-gray-600">Rating</th>
-                <th className="text-left py-3 font-medium text-gray-600">Status</th>
+                <th className="text-left py-3 px-2 font-medium text-gray-600">Nama</th>
+                <th className="text-left py-3 px-2 font-medium text-gray-600">Departemen</th>
+                <th className="text-left py-3 px-2 font-medium text-gray-600">Pasien</th>
+                <th className="text-left py-3 px-2 font-medium text-gray-600">Rating</th>
               </tr>
             </thead>
             <tbody>
               {teamData.map((member, index) => (
                 <tr key={index} className="border-b border-gray-100">
-                  <td className="py-4">
+                  <td className="py-4 px-2">
                     <div className="flex items-center space-x-3">
                       <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
                         <User className="w-4 h-4 text-blue-600" />
@@ -488,17 +444,13 @@ const StatCard = ({ title, value, unit, change, icon: Icon, color }: StatCardPro
                       <span className="font-medium text-gray-800">{member.name}</span>
                     </div>
                   </td>
-                  <td className="py-4 text-gray-600">{member.department}</td>
-                  <td className="py-4 text-gray-600">{member.patients}</td>
-                  <td className="py-4 text-gray-600">{member.consultations}</td>
-                  <td className="py-4">
+                  <td className="py-4 px-2 text-gray-600">{member.department}</td>
+                  <td className="py-4 px-2 text-gray-600">{member.patients}</td>
+                  <td className="py-4 px-2">
                     <div className="flex items-center space-x-1">
                       <span className="text-yellow-500">★</span>
                       <span className="text-gray-600">{member.rating}</span>
                     </div>
-                  </td>
-                  <td className="py-4">
-                    <span className="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs">Aktif</span>
                   </td>
                 </tr>
               ))}
@@ -506,48 +458,19 @@ const StatCard = ({ title, value, unit, change, icon: Icon, color }: StatCardPro
           </table>
         </div>
       </div>
-
-      <div className="bg-white rounded-xl shadow-sm p-6">
-        <h3 className="text-lg font-semibold text-gray-800 mb-4">Perbandingan Kinerja Tim</h3>
-        <ResponsiveContainer width="100%" height={300}>
-          <BarChart data={teamData}>
-            <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="name" />
-            <YAxis />
-            <Tooltip />
-            <Bar dataKey="patients" fill="#3B82F6" name="Pasien" />
-            <Bar dataKey="consultations" fill="#10B981" name="Konsultasi" />
-          </BarChart>
-        </ResponsiveContainer>
-      </div>
     </div>
   );
-
+  
   const SentimentAnalysisTab = () => (
     <div className="space-y-6">
       <div className="bg-white rounded-xl shadow-sm p-6">
         <h3 className="text-lg font-semibold text-gray-800 mb-4">Analisis Sentimen Kepuasan Pasien (AI)</h3>
-        <p className="text-gray-600 mb-4">Memanfaatkan AI untuk menganalisis umpan balik tekstual pasien dan mengukur sentimen mereka terhadap layanan Puskesmas secara keseluruhan.</p>
+        <p className="text-gray-600 mb-4 text-sm">Memanfaatkan AI untuk menganalisis umpan balik tekstual pasien dan mengukur sentimen mereka terhadap layanan Puskesmas secara keseluruhan.</p>
         
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-          <StatCard
-            title="Sentimen Positif"
-            value="82%"
-            icon={Smile}
-            color="bg-green-500"
-          />
-          <StatCard
-            title="Sentimen Netral"
-            value="13%"
-            icon={FileText}
-            color="bg-blue-500"
-          />
-          <StatCard
-            title="Sentimen Negatif"
-            value="5%"
-            icon={Frown}
-            color="bg-red-500"
-          />
+          <StatCard title="Sentimen Positif" value="82%" icon={Smile} color="bg-green-500"/>
+          <StatCard title="Sentimen Netral" value="13%" icon={FileText} color="bg-blue-500"/>
+          <StatCard title="Sentimen Negatif" value="5%" icon={Frown} color="bg-red-500"/>
         </div>
 
         <h4 className="text-md font-semibold text-gray-800 mt-6 mb-3">Trend Sentimen Bulanan</h4>
@@ -557,33 +480,16 @@ const StatCard = ({ title, value, unit, change, icon: Icon, color }: StatCardPro
             <XAxis dataKey="month" />
             <YAxis />
             <Tooltip />
-            <Line type="monotone" dataKey="positive" stroke="#10B981" strokeWidth={2} name="Positif" />
-            <Line type="monotone" dataKey="neutral" stroke="#3B82F6" strokeWidth={2} name="Netral" />
-            <Line type="monotone" dataKey="negative" stroke="#EF4444" strokeWidth={2} name="Negatif" />
+            <Line type="monotone" dataKey="positive" stroke="#10B981" strokeWidth={2} name="Positif (%)" />
+            <Line type="monotone" dataKey="neutral" stroke="#3B82F6" strokeWidth={2} name="Netral (%)" />
+            <Line type="monotone" dataKey="negative" stroke="#EF4444" strokeWidth={2} name="Negatif (%)" />
           </LineChart>
         </ResponsiveContainer>
-
-        <h4 className="text-md font-semibold text-gray-800 mt-6 mb-3">Umpan Balik Terbaru (Contoh)</h4>
-        <div className="space-y-3">
-          <div className="p-3 bg-gray-50 rounded-lg border border-gray-200">
-            <p className="text-gray-700">"Pelayanan sangat cepat dan ramah, dokter menjelaskan dengan jelas. Sangat puas!"</p>
-            <p className="text-xs text-gray-500 mt-1 flex items-center"><Smile className="w-3 h-3 mr-1 text-green-600" /> Sentimen: Positif</p>
-          </div>
-          <div className="p-3 bg-gray-50 rounded-lg border border-gray-200">
-            <p className="text-gray-700">"Waktu tunggu sedikit lama, tapi stafnya membantu."</p>
-            <p className="text-xs text-gray-500 mt-1 flex items-center"><FileText className="w-3 h-3 mr-1 text-blue-600" /> Sentimen: Netral</p>
-          </div>
-          <div className="p-3 bg-gray-50 rounded-lg border border-gray-200">
-            <p className="text-gray-700">"Agak kecewa dengan kurangnya informasi yang diberikan."</p>
-            <p className="text-xs text-gray-500 mt-1 flex items-center"><Frown className="w-3 h-3 mr-1 text-red-600" /> Sentimen: Negatif</p>
-          </div>
-        </div>
       </div>
     </div>
   );
 
-
-  const SettingsTab = () => (
+const SettingsTab = () => (
     <div className="space-y-6">
       <div className="bg-white rounded-xl shadow-sm p-6">
         <h3 className="text-lg font-semibold text-gray-800 mb-4">Pengaturan Profil</h3>
@@ -662,6 +568,80 @@ const StatCard = ({ title, value, unit, change, icon: Icon, color }: StatCardPro
       </div>
     </div>
   );
+  
+  // 2. Komponen Modal untuk Laporan
+  type ReportModalProps = {
+    reportType: string;
+    onClose: () => void;
+  };
+  
+  const ReportModal = ({ reportType, onClose }: ReportModalProps) => {
+    // Dummy content based on report type
+    const getDummyContent = () => {
+      switch (reportType) {
+        case 'Harian':
+          return (
+            <div className="text-gray-600 space-y-4 text-sm">
+              <p><strong>Tanggal:</strong> 31 Mei 2024</p>
+              <p><strong>Total Pasien:</strong> 40</p>
+              <p><strong>Konsultasi Selesai:</strong> 35</p>
+              <p><strong>Waktu Tunggu Rata-rata:</strong> 8 Menit</p>
+              <p><strong>Rating Kepuasan:</strong> 4.8 / 5.0</p>
+              <p><strong>Catatan:</strong> Tidak ada insiden khusus yang dilaporkan. Kinerja sesuai target.</p>
+            </div>
+          );
+        case 'Mingguan':
+          return (
+            <div className="text-gray-600 space-y-4 text-sm">
+              <p><strong>Periode:</strong> 27 Mei - 31 Mei 2024</p>
+              <p><strong>Total Pasien Minggu Ini:</strong> 160</p>
+              <p><strong>Rata-rata Pasien Harian:</strong> 32</p>
+              <p><strong>Trend Pasien:</strong> Meningkat 15% dari minggu lalu.</p>
+              <p><strong>Waktu Tunggu Terendah:</strong> 8 Menit (Jumat)</p>
+              <p><strong>Waktu Tunggu Tertinggi:</strong> 18 Menit (Rabu)</p>
+              <p><strong>Catatan:</strong> Perlu evaluasi alur pada hari Rabu untuk mengurangi waktu tunggu.</p>
+            </div>
+          );
+        case 'Bulanan':
+          return (
+            <div className="text-gray-600 space-y-4 text-sm">
+              <p><strong>Bulan:</strong> Mei 2024</p>
+              <p><strong>Total Pasien Bulan Ini:</strong> 650</p>
+              <p><strong>Distribusi Departemen:</strong> Umum (35%), Anak (25%), Kebidanan (20%), Gigi (20%)</p>
+              <p><strong>Sentimen Pasien:</strong> Positif (82%), Netral (13%), Negatif (5%)</p>
+              <p><strong>Pencapaian Target:</strong> 105% dari target bulanan.</p>
+              <p><strong>Rekomendasi:</strong> Alokasikan lebih banyak sumber daya ke departemen Umum pada jam sibuk.</p>
+            </div>
+          );
+        default:
+          return <p>Tidak ada data untuk ditampilkan.</p>;
+      }
+    };
+
+    return (
+      <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+        <div className="bg-white rounded-xl shadow-2xl w-full max-w-lg">
+          <div className="p-4 border-b flex justify-between items-center">
+            <h3 className="text-lg font-semibold text-gray-800">Laporan {reportType}</h3>
+            <button onClick={onClose} className="p-1 rounded-full hover:bg-gray-200">
+              <X className="w-5 h-5 text-gray-600" />
+            </button>
+          </div>
+          <div className="p-6">
+            {getDummyContent()}
+          </div>
+          <div className="p-4 border-t text-right">
+            <button 
+              onClick={onClose}
+              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+            >
+              Tutup
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  };
 
   if (!user) {
     return <LoginForm />;
@@ -670,7 +650,7 @@ const StatCard = ({ title, value, unit, change, icon: Icon, color }: StatCardPro
   return (
     <div className="flex h-screen bg-gray-50">
       <Sidebar />
-      {isSidebarOpen && <div className="overlay md:hidden" onClick={() => setIsSidebarOpen(false)}></div>} {/* Overlay for mobile */}
+      {isSidebarOpen && <div className="fixed inset-0 bg-black bg-opacity-30 z-40 md:hidden" onClick={() => setIsSidebarOpen(false)}></div>}
       <div className="flex-1 flex flex-col overflow-hidden">
         <Header />
         <main className="flex-1 overflow-y-auto p-6">
@@ -682,6 +662,14 @@ const StatCard = ({ title, value, unit, change, icon: Icon, color }: StatCardPro
           {activeTab === 'settings' && <SettingsTab />}
         </main>
       </div>
+
+      {/* Tampilkan modal jika reportModalContent tidak null */}
+      {reportModalContent && (
+        <ReportModal 
+          reportType={reportModalContent}
+          onClose={() => setReportModalContent(null)}
+        />
+      )}
     </div>
   );
 };
